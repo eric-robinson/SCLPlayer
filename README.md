@@ -1,6 +1,5 @@
 # SCLPlayer
 
-[![CI Status](http://img.shields.io/travis/Eric Robinson/SCLPlayer.svg?style=flat)](https://travis-ci.org/Eric Robinson/SCLPlayer)
 [![Version](https://img.shields.io/cocoapods/v/SCLPlayer.svg?style=flat)](http://cocoadocs.org/docsets/SCLPlayer)
 [![License](https://img.shields.io/cocoapods/l/SCLPlayer.svg?style=flat)](http://cocoadocs.org/docsets/SCLPlayer)
 [![Platform](https://img.shields.io/cocoapods/p/SCLPlayer.svg?style=flat)](http://cocoadocs.org/docsets/SCLPlayer)
@@ -41,6 +40,8 @@ You can also message the HTML5 player directly through SCLPlayer's UIWebView. Th
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Requirements
+
+SCLPlayer is built for iOS 7 and above.
 
 ## Installation
 
