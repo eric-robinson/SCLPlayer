@@ -11,6 +11,7 @@
 @interface SCLPlayerViewController : UIViewController
 
 @property (readonly, strong, nonatomic) UIWebView* webview;
+@property (readonly, strong, nonatomic) UILabel *connectionIssueLabel;
 
 - (id)initWithURL:(NSURL*)url configuration:(NSDictionary*)config;
 

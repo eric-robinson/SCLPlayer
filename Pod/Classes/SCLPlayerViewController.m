@@ -118,7 +118,7 @@ NSString* const LWLPlayerPropertyBuying = @"buying";
     self.connectionIssueLabel = [[UILabel alloc] initWithFrame:self.webview.bounds];
     self.connectionIssueLabel.text = NSLocalizedString(@"Device Offline", nil);
     self.connectionIssueLabel.textAlignment = NSTextAlignmentCenter;
-    self.connectionIssueLabel.font = [UIFont fontWithName:@"Futura-Medium" size:18.f];
+    self.connectionIssueLabel.font = [UIFont systemFontOfSize:18.f];
     self.connectionIssueLabel.textColor = [UIColor whiteColor];
     self.connectionIssueLabel.alpha = 0;
     
@@ -129,7 +129,7 @@ NSString* const LWLPlayerPropertyBuying = @"buying";
     
     NSAssert(scURL, @"Unable to find soundcloudPlayer.html in source bundle");
     
-    NSString* urlParam = [@"https://soundcloud.com/eeeee-5/sets/tracks" stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString* urlParam = [[self.initialURL absoluteString] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSMutableString* configurationParams = [NSMutableString new];
     
     __block NSUInteger configIndex = 0;
