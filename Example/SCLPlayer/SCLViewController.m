@@ -21,10 +21,11 @@
 {
     [super viewDidLoad];
 
-    self.playerVC = [[SCLPlayerViewController alloc] initWithURL:[NSURL URLWithString:@"https://soundcloud.com/eeeee-5/sets/tracks"] configuration:nil];
+    self.playerVC = [[SCLPlayerViewController alloc] initWithURL:[NSURL URLWithString:@"https://soundcloud.com/eeeee-5/sets/tracks"]
+                                                   configuration:@{SCLPlayerPropertyShowArtwork : @YES, SCLPlayerPropertyShowUser : @YES}];
     
     CGRect screenBounds = [UIScreen mainScreen].bounds;
-    self.playerVC.view.frame = CGRectMake(0, 48.f, CGRectGetWidth(screenBounds), 128.f);
+    self.playerVC.view.frame = CGRectMake(0, 48.f, CGRectGetWidth(screenBounds), 320.f);
     
     [self.view addSubview:self.playerVC.view];
 }

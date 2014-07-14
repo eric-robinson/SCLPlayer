@@ -1,9 +1,9 @@
 //
 //  SCLPlayerViewController.m
-//  lwlvl
+//  SCLvl
 //
 //  Created by Eric Robinson on 7/10/14.
-//  Copyright (c) 2014 lwlvl. All rights reserved.
+//  Copyright (c) 2014 SCLvl. All rights reserved.
 //
 
 #import "SCLPlayerViewController.h"
@@ -19,14 +19,14 @@ NSString* const SCLPlayerDidPauseNotification = @"SCLPlayerDidPauseNotification"
 NSString* const SCLPlayerDidFinishNotification = @"SCLPlayerDidPauseNotification";
 
 #pragma mark Configuration
-NSString* const LWLPlayerPropertyHideRelated = @"hide_related";
-NSString* const LWLPlayerPropertyShowComments = @"show_comments";
-NSString* const LWLPlayerPropertyShowUser  = @"show_user";
-NSString* const LWLPlayerPropertyShowArtwork = @"show_artwork";
-NSString* const LWLPlayerPropertySharing = @"sharing";
-NSString* const LWLPlayerPropertyLiking = @"liking";
-NSString* const LWLPlayerPropertyDownload = @"download";
-NSString* const LWLPlayerPropertyBuying = @"buying";
+NSString* const SCLPlayerPropertyHideRelated = @"hide_related";
+NSString* const SCLPlayerPropertyShowComments = @"show_comments";
+NSString* const SCLPlayerPropertyShowUser  = @"show_user";
+NSString* const SCLPlayerPropertyShowArtwork = @"show_artwork";
+NSString* const SCLPlayerPropertySharing = @"sharing";
+NSString* const SCLPlayerPropertyLiking = @"liking";
+NSString* const SCLPlayerPropertyDownload = @"download";
+NSString* const SCLPlayerPropertyBuying = @"buying";
 
 @interface SCLPlayerViewController () <UIWebViewDelegate>
 
@@ -69,7 +69,7 @@ NSString* const LWLPlayerPropertyBuying = @"buying";
         [config enumerateKeysAndObjectsUsingBlock:^(NSString* propertyName, id propertyValue, BOOL *stop) {
             if([propertyValue isKindOfClass:[NSNumber class]])
             {
-                [self.playerConfiguration setObject:([propertyValue boolValue] ? @"true":@"false") forKey:propertyValue];
+                [self.playerConfiguration setObject:([propertyValue boolValue] ? @"true":@"false") forKey:propertyName];
             }
             else
             {
@@ -299,14 +299,14 @@ NSString* const LWLPlayerPropertyBuying = @"buying";
 
 - (NSArray*)allPlayerProperties
 {
-    return @[LWLPlayerPropertyHideRelated,
-             LWLPlayerPropertyShowComments,
-             LWLPlayerPropertyShowUser,
-             LWLPlayerPropertyShowArtwork,
-             LWLPlayerPropertySharing,
-             LWLPlayerPropertyLiking,
-             LWLPlayerPropertyDownload,
-             LWLPlayerPropertyBuying];
+    return @[SCLPlayerPropertyHideRelated,
+             SCLPlayerPropertyShowComments,
+             SCLPlayerPropertyShowUser,
+             SCLPlayerPropertyShowArtwork,
+             SCLPlayerPropertySharing,
+             SCLPlayerPropertyLiking,
+             SCLPlayerPropertyDownload,
+             SCLPlayerPropertyBuying];
 }
 
 @end
