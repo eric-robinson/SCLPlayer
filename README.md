@@ -9,7 +9,7 @@
 
 To create a player...
 
-`[[SCLPlayerViewController alloc] initWithURL:[NSURL URLWithString:@"https://soundcloud.com/eeeee-5/sets/tracks"] configuration:nil]`
+`[[SCLPlayerViewController alloc] initWithURL:<<Soundcloud URL>> configuration:nil]`
 
 You can subscribe to events to update your UI based on user interaction with the player. The available notifications are...
 ```
