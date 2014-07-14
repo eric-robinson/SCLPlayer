@@ -11,7 +11,7 @@ SCLPlayer is a UIWebView based wrapper for the Soundcloud HTML5 widget. It allow
 
 To create a player...
 
-`[[SCLPlayerViewController alloc] initWithURL:[NSURL URLWithString:@"https://soundcloud.com/eeeee-5/sets/tracks"] configuration:nil]`
+`[[SCLPlayerViewController alloc] initWithURL:<<Soundcloud URL>> configuration:nil]`
 
 To control the player...
 
