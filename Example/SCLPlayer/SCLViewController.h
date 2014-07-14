@@ -10,4 +10,9 @@
 
 @interface SCLViewController : UIViewController
 
+- (IBAction)play:(id)sender;
+- (IBAction)pause:(id)sender;
+- (IBAction)next:(id)sender;
+- (IBAction)prev:(id)sender;
+
 @end
