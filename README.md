@@ -7,6 +7,18 @@
 
 ## Usage
 
+To create a player...
+
+`[[SCLPlayerViewController alloc] initWithURL:[NSURL URLWithString:@"https://soundcloud.com/eeeee-5/sets/tracks"] configuration:nil]`
+
+You can subscribe to events to update your UI based on user interaction with the player. The available notifications are...
+```
+SCLPlayerDidLoadNotification
+SCLPlayerDidPlayNotification
+SCLPlayerDidPauseNotification
+SCLPlayerDidFinishNotification
+````
+
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Requirements
@@ -20,7 +32,7 @@ it, simply add the following line to your Podfile:
 
 ## Author
 
-Eric Robinson, ericrobinson@ultravisual.com
+Eric Robinson, eric DOT robinson AT me.com
 
 ## License
 
