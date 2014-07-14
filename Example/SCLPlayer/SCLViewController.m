@@ -55,5 +55,9 @@
     [self.playerVC prev];
 }
 
+- (IBAction)toggle:(id)sender
+{
+    [self.playerVC toggle];
+}
 
 @end

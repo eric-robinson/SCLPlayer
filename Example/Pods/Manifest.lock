@@ -22,7 +22,7 @@ SPEC CHECKSUMS:
   Expecta: 03aabd0a89d8dea843baecb19a7fd7466a69a31d
   EXPMatchers+FBSnapshotTest: fcc428d6a5d4410c1711aeda4456c9c5e93f98d3
   FBSnapshotTestCase: 9053afee1d66b4c7c313fcb0ae582a5e47bea9d0
-  SCLPlayer: 23f8bea7ded94b4885ea6c5c85b47f721b2de3a8
+  SCLPlayer: 97c5bb9dff3b3941dfbc82b613999aaa5237ed32
   Specta: 9141310f46b1f68b676650ff2854e1ed0b74163a
 
 COCOAPODS: 0.33.1

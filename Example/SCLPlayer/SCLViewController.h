@@ -15,4 +15,6 @@
 - (IBAction)next:(id)sender;
 - (IBAction)prev:(id)sender;
 
+- (IBAction)toggle:(id)sender;
+
 @end

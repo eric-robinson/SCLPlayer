@@ -16,15 +16,29 @@
 - (id)initWithURL:(NSURL*)url configuration:(NSDictionary*)config;
 
 #pragma mark - Player Controls
+
+/** Start playing from the current position */
 - (void)play;
+
+/** If showing a playlist, jump to the given track id */
 - (void)playTrackWithID:(NSString*)soundcloudTrackID;
+
+/** Pause the player */
 - (void)pause;
 
+/** Advance the player to the next track */
 - (void)next;
+
+/** Set the player to the previous track */
 - (void)prev;
 
+/** Seek the player to the provided millisecond */
 - (void)seekTo:(NSUInteger)milliseconds;
+
+/** Set the volume of the player (0-100) */
 - (void)setVolume:(NSUInteger)volume;
+
+/** "Toggle" the player */
 - (void)toggle;
 
 @end
