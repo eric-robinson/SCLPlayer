@@ -4,13 +4,13 @@
 [![License](https://img.shields.io/cocoapods/l/SCLPlayer.svg?style=flat)](http://cocoadocs.org/docsets/SCLPlayer)
 [![Platform](https://img.shields.io/cocoapods/p/SCLPlayer.svg?style=flat)](http://cocoadocs.org/docsets/SCLPlayer)
 
-SCLPlayer is a UIWebView based wrapper for the Soundcloud HTML5 widget. It allows you to easily embed a Soundcloud player and message it from your Cocoa code.
+SCLPlayer is a UIWebView based wrapper for the SoundCloud HTML5 widget. It allows you to easily embed a SoundCloud player and message it from your Cocoa code.
 
 ## Usage
 
 To create a player...
 
-`[[SCLPlayerViewController alloc] initWithURL:<<Soundcloud URL>> configuration:nil]`
+`[[SCLPlayerViewController alloc] initWithURL:<<SoundCloud URL>> configuration:nil]`
 
 To control the player...
 
