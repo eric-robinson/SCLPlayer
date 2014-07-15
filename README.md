@@ -42,6 +42,9 @@ SCLPlayerDidLoadNotification
 SCLPlayerDidPlayNotification
 SCLPlayerDidPauseNotification
 SCLPlayerDidFinishNotification
+SCLPlayerDidSeekNotification
+SCLPlayerPlayProgressNotification
+SCLPlayerLoadProgressNotification
 ````
 
 You can also message the HTML5 player directly through SCLPlayer's UIWebView. The widget object is accessible through `SCLPlayer.scPlayer()`...
