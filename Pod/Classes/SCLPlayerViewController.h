@@ -56,12 +56,22 @@ typedef void (^SCLPlayerResponseHandler)(id results);
 /**  Jump to the soundIndex sound, starting from 0 (only if the widget contains multiple sounds) */
 - (void)skip:(NSUInteger)soundIndex;
 
+/** Get the current sounds */
 - (void)getSounds:(SCLPlayerResponseHandler)responseBlock;
+
+/** Get the current sound */
 - (void)getCurrentSound:(SCLPlayerResponseHandler)responseBlock;
+
+/** Get the current sound index */
 - (void)getCurrentSoundIndex:(SCLPlayerResponseHandler)responseBlock;
 
+/** Get the volume */
 - (void)getVolume:(SCLPlayerResponseHandler)responseBlock;
+
+/** Get the duration */
 - (void)getDuration:(SCLPlayerResponseHandler)responseBlock;
+
+/** Get the position */
 - (void)getPosition:(SCLPlayerResponseHandler)responseBlock;
 
 @end
