@@ -25,12 +25,26 @@ To control the player...
 - (void)toggle;
 ```
 
+To query the player...
+
+```
+- (void)getSounds:(SCLPlayerResponseHandler)responseBlock;
+- (void)getCurrentSound:(SCLPlayerResponseHandler)responseBlock;
+- (void)getCurrentSoundIndex:(SCLPlayerResponseHandler)responseBlock;
+- (void)getVolume:(SCLPlayerResponseHandler)responseBlock;
+- (void)getDuration:(SCLPlayerResponseHandler)responseBlock;
+- (void)getPosition:(SCLPlayerResponseHandler)responseBlock;
+```
+
 You can subscribe to events to update your UI based on user interaction with the player. The available notifications are...
 ```
 SCLPlayerDidLoadNotification
 SCLPlayerDidPlayNotification
 SCLPlayerDidPauseNotification
 SCLPlayerDidFinishNotification
+SCLPlayerDidSeekNotification
+SCLPlayerPlayProgressNotification
+SCLPlayerLoadProgressNotification
 ````
 
 You can also message the HTML5 player directly through SCLPlayer's UIWebView. The widget object is accessible through `SCLPlayer.scPlayer()`...
