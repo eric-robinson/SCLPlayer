@@ -44,28 +44,98 @@
                             SCLPlayer.playTrack(trackID);
                         });
                     }
-                }
+                },
+				
+				getSounds : function() {
+                    player = SCLPlayer.scPlayer();
+					
+                    if( SCLPlayer.isPlayerLoaded ) {
+                        player.getSounds(function(currentSounds) {
+                            window.location = 'sclplayer://getSounds?' + JSON.stringify(currentSounds);
+                        });
+                    }
+				},
+				
+				getCurrentSound : function() {
+                    player = SCLPlayer.scPlayer();
+					
+                    if( SCLPlayer.isPlayerLoaded ) {
+                        player.getCurrentSound(function(currentSound) {
+                            window.location = 'sclplayer://getCurrentSound?' + JSON.stringify(currentSound);
+                        });
+                    }
+				},
+				
+				getCurrentSoundIndex : function() {
+                    player = SCLPlayer.scPlayer();
+					
+                    if( SCLPlayer.isPlayerLoaded ) {
+                        player.getCurrentSoundIndex(function(currentSoundIndex) {
+                            window.location = 'sclplayer://getCurrentSoundIndex?' + currentSoundIndex;
+                        });
+                    }
+				},
+				
+                getDuration : function() {
+                    player = SCLPlayer.scPlayer();
+					
+                    if( SCLPlayer.isPlayerLoaded ) {
+                        player.getDuration(function(duration) {
+                                         window.location = 'sclplayer://getDuration?' + duration;
+                        });
+                    }
+				},
+				
+                getVolume : function() {
+                    player = SCLPlayer.scPlayer();
+					
+                    if( SCLPlayer.isPlayerLoaded ) {
+                        player.getVolume(function(volume) {
+                                         window.location = 'sclplayer://getVolume?' + volume;
+                        });
+                    }
+				},
+				
+                getPosition : function() {
+                    player = SCLPlayer.scPlayer();
+					
+                    if( SCLPlayer.isPlayerLoaded ) {
+                        player.getPosition(function(position) {
+                             window.location = 'sclplayer://getPosition?' + position;
+                        });
+                    }
+				}				
             };
         
-            $( '#sc' ).ready(function() {
+            $('#sc').ready(function() {
                 SCLPlayer.scPlayer().bind(SC.Widget.Events.READY, function() {
                     SCLPlayer.isPlayerLoaded = true;
                     window.location = 'sclplayer://didLoad';
                 });
                              
-                SCLPlayer.scPlayer().bind(SC.Widget.Events.PLAY, function() {
+                SCLPlayer.scPlayer().bind(SC.Widget.Events.PLAY, function(context) {
                     SCLPlayer.isPaused = false;
-                    window.location = 'sclplayer://didPlay';
+                    window.location = 'sclplayer://didPlay?' + JSON.stringify(context);
                 });
 
-                SCLPlayer.scPlayer().bind(SC.Widget.Events.PAUSE, function() {
+                SCLPlayer.scPlayer().bind(SC.Widget.Events.PAUSE, function(context) {
                     SCLPlayer.isPaused = true;
-                    window.location = 'sclplayer://didPause';
+                    window.location = 'sclplayer://didPause?' + JSON.stringify(context);
                 });
                              
-                SCLPlayer.scPlayer().bind(SC.Widget.Events.FINISH, function() {
+                SCLPlayer.scPlayer().bind(SC.Widget.Events.FINISH, function(context) {
                     SCLPlayer.isPaused = true;
-                    window.location = 'sclplayer://didFinish';
+                    window.location = 'sclplayer://didFinish?' + JSON.stringify(context);
+                });
+                             
+                SCLPlayer.scPlayer().bind(SC.Widget.Events.LOAD_PROGRESS, function(context) {
+                    SCLPlayer.isPaused = true;
+                    window.location = 'sclplayer://loadProgress?' + JSON.stringify(context);
+                });
+                             
+                SCLPlayer.scPlayer().bind(SC.Widget.Events.PLAY_PROGRESS, function(context) {
+                    SCLPlayer.isPaused = true;
+                    window.location = 'sclplayer://playProgress?' + JSON.stringify(context);
                 });
             });
         </script>
@@ -75,7 +145,7 @@
         <iframe id = "sc" width="100%" height="100%" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url={{URL}}&amp;{{CONFIGURATION}}"></iframe>
 	</body>
 	<script>
-		$( "#sc" ).ready(function() {
+		$("#sc").ready(function() {
             var widgetIframe = document.getElementById('sc'),
             widget = SC.Widget(widgetIframe);
              

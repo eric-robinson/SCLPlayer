@@ -1,9 +1,8 @@
 //
 //  SCLPlayerViewController.m
-//  SCLvl
 //
 //  Created by Eric Robinson on 7/10/14.
-//  Copyright (c) 2014 SCLvl. All rights reserved.
+//  Copyright (c) 2014 Eric Robinson. All rights reserved.
 //
 
 #import "SCLPlayerViewController.h"
@@ -17,6 +16,12 @@ NSString* const SCLPlayerDidLoadNotification = @"SCLPlayerDidLoadNotification";
 NSString* const SCLPlayerDidPlayNotification = @"SCLPlayerDidPlayNotification";
 NSString* const SCLPlayerDidPauseNotification = @"SCLPlayerDidPauseNotification";
 NSString* const SCLPlayerDidFinishNotification = @"SCLPlayerDidPauseNotification";
+NSString* const SCLPlayerDidSeekNotification = @"SCLPlayerDidSeekNotification";
+
+NSString* const SCLPlayerPlayProgressNotification = @"SCLPlayerPlayProgressNotification";
+NSString* const SCLPlayerLoadProgressNotification = @"SCLPlayerLoadProgressNotification";
+
+NSString* const SCLPlayerContextUserInfoKey = @"SCLPlayerContext";
 
 #pragma mark Configuration
 NSString* const SCLPlayerPropertyHideRelated = @"hide_related";
@@ -46,8 +51,12 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
 
 #pragma mark State Tracking
 
+@property (readwrite, assign, nonatomic) BOOL isPaused;
+
 @property (readwrite, strong, nonatomic) NSString *pendingTrackID;
 @property (readwrite, assign, nonatomic) BOOL hasLoadedPlayer;
+
+@property (readwrite, strong, nonatomic) NSMutableDictionary* pendingResponseHandlers;
 
 @end
 
@@ -59,6 +68,8 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
     
     if (self)
     {
+        self.isPaused = YES;
+        
         self.initialURL = url;
         self.playerConfiguration = [NSMutableDictionary dictionary];
         for (NSString* property in [self allPlayerProperties])
@@ -75,6 +86,13 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
             {
                 [self.playerConfiguration setObject:propertyValue forKey:propertyName];
             }
+        }];
+        
+        self.pendingResponseHandlers = [NSMutableDictionary dictionary];
+        
+        [self.pendingResponseHandlers addEntriesFromDictionary:@{
+            @"getSounds" : [NSMutableArray array],
+            @"getCurrentSound" : [NSMutableArray array]
         }];
     }
     
@@ -124,9 +142,7 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
     
     [self.webview addSubview:self.connectionIssueLabel];
     
-    
     NSURL* scURL = [[NSBundle mainBundle] URLForResource:@"soundcloudPlayer" withExtension:@"html"];
-    
     NSAssert(scURL, @"Unable to find soundcloudPlayer.html in source bundle");
     
     NSString* urlParam = [[self.initialURL absoluteString] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
@@ -215,6 +231,11 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
     [self.webview stringByEvaluatingJavaScriptFromString:@"SCLPlayer.scPlayer().prev()"];
 }
 
+- (void)skip:(NSUInteger)soundIndex
+{
+    [self.webview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"SCLPlayer.scPlayer().skip(%@)", @(soundIndex)]];
+}
+
 - (void)seekTo:(NSUInteger)milliseconds
 {
     [self.webview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"SCLPlayer.scPlayer().seekTo(%@)", @(milliseconds)]];
@@ -222,6 +243,7 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
 
 - (void)setVolume:(NSUInteger)volume
 {
+    //bind the input
     volume = MIN(MAX(volume, 0), 100);
     [self.webview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"SCLPlayer.scPlayer().setVolume(%@)", @(volume)]];
 }
@@ -231,30 +253,116 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
     [self.webview stringByEvaluatingJavaScriptFromString:@"SCLPlayer.scPlayer().toggle()"];
 }
 
+- (void)performQuery:(NSString*)query withResponseHandler:(SCLPlayerResponseHandler)responseBlock
+{
+    SCLPlayerResponseHandler responseCopy = [responseBlock copy];
+    [(NSMutableArray*)[self.pendingResponseHandlers objectForKey:query] addObject:responseCopy];
+    
+    NSString* js = [NSString stringWithFormat:@"SCLPlayer.%@()", query];
+    [self.webview stringByEvaluatingJavaScriptFromString:js];
+}
+
+- (void)getSounds:(SCLPlayerResponseHandler)responseBlock
+{
+    [self performQuery:@"getSounds" withResponseHandler:responseBlock];
+}
+
+- (void)getCurrentSound:(SCLPlayerResponseHandler)responseBlock
+{
+    [self performQuery:@"getCurrentSound" withResponseHandler:responseBlock];
+}
+
+- (void)getCurrentSoundIndex:(SCLPlayerResponseHandler)responseBlock
+{
+    [self performQuery:@"getCurrentSoundIndex" withResponseHandler:responseBlock];
+}
+
+- (void)getVolume:(SCLPlayerResponseHandler)responseBlock
+{
+    [self performQuery:@"getVolume" withResponseHandler:responseBlock];
+}
+
+- (void)getDuration:(SCLPlayerResponseHandler)responseBlock
+{
+    [self performQuery:@"getDuration" withResponseHandler:responseBlock];
+}
+
+- (void)getPosition:(SCLPlayerResponseHandler)responseBlock
+{
+    [self performQuery:@"getPosition" withResponseHandler:responseBlock];
+}
+
 #pragma mark - UIWebViewDelegate
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
+    // sclplayer:// is used to message the webview from soundcloudPlayer.html
     if([[request.URL scheme] isEqualToString:@"sclplayer"])
     {
         NSString* urlString = [request.URL absoluteString];
         NSString* playerMessage = [urlString stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@://", [request.URL scheme]] withString:@""];
         
-        if([playerMessage isEqualToString:@"didLoad"])
+        NSRange queryRange = [playerMessage rangeOfString:@"?"];
+        NSString* command = (queryRange.location == NSNotFound) ? playerMessage : [playerMessage substringToIndex:queryRange.location];
+        
+        NSString* contextJSON = (queryRange.location == NSNotFound) ? nil : [[playerMessage substringFromIndex:queryRange.location + 1] stringByRemovingPercentEncoding];
+        
+        NSError* jsonParsingError = nil;
+        id context = [NSJSONSerialization JSONObjectWithData:[contextJSON dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&jsonParsingError];
+        
+        if(jsonParsingError)
+        {
+            NSNumberFormatter * numberFormatter = [[NSNumberFormatter alloc] init];
+            [numberFormatter setNumberStyle:NSNumberFormatterDecimalStyle];
+            context = [numberFormatter numberFromString:contextJSON];
+            
+            if(context == nil)
+            {
+                NSLog(@"%s: Unable to parse response param: %@", __PRETTY_FUNCTION__, urlString);                
+            }
+        }
+        
+        NSDictionary* userContext = context ?: @{SCLPlayerContextUserInfoKey : context};
+        
+        if ([command isEqualToString:@"didLoad"])
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerDidLoadNotification object:nil];
         }
-        else if([playerMessage isEqualToString:@"didPlay"])
+        else if ([command isEqualToString:@"didPlay"])
         {
-            [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerDidPlayNotification object:nil];
+            self.isPaused = NO;
+            [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerDidPlayNotification object:self userInfo:userContext];
         }
-        else if([playerMessage isEqualToString:@"didPause"])
+        else if ([command isEqualToString:@"didPause"])
         {
-            [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerDidPauseNotification object:nil];
+            self.isPaused = YES;
+            [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerDidPauseNotification object:self userInfo:userContext];
         }
-        else if([playerMessage isEqualToString:@"didFinish"])
+        else if ([command isEqualToString:@"didFinish"])
         {
-            [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerDidFinishNotification object:nil];
+            self.isPaused = YES;
+            [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerDidFinishNotification object:self userInfo:userContext];
+        }
+        else if ([command isEqualToString:@"didSeek"])
+        {
+            [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerDidSeekNotification object:self userInfo:userContext];
+        }
+        else if ([command isEqualToString:@"playProgress"])
+        {
+            [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerPlayProgressNotification object:self userInfo:userContext];
+        }
+        else if ([command isEqualToString:@"loadProgress"])
+        {
+            [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerLoadProgressNotification object:self userInfo:userContext];
+        }
+        else if ([command hasPrefix:@"get"])
+        {
+            for(SCLPlayerResponseHandler handler in [self.pendingResponseHandlers objectForKey:command])
+            {
+                handler(context);
+            }
+            
+            [self.pendingResponseHandlers setObject:[NSMutableArray array] forKey:command];
         }
         
         return NO;

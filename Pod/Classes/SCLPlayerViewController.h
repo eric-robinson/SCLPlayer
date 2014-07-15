@@ -1,14 +1,26 @@
 //
 //  SCLPlayerViewController.h
-//  lwlvl
+//  SCLPlayer
+//
+//  This class provides a UIWebView based SoundCloud player with relatively complete api coverage.
+//  Docs for the js widget can be found at: https://developers.soundcloud.com/docs/api/html5-widget
 //
 //  Created by Eric Robinson on 7/10/14.
-//  Copyright (c) 2014 lwlvl. All rights reserved.
+//  Copyright (c) 2014 Eric Robinson. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
+
+#pragma mark - Typedefs
+typedef void (^SCLPlayerResponseHandler)(id results);
+
+
+#pragma mark = SCLPlayerViewConroller
+
 @interface SCLPlayerViewController : UIViewController
+
+@property (readonly, assign, nonatomic) BOOL isPaused;
 
 @property (readonly, strong, nonatomic) UIWebView* webview;
 @property (readonly, strong, nonatomic) UILabel *connectionIssueLabel;
@@ -20,7 +32,7 @@
 /** Start playing from the current position */
 - (void)play;
 
-/** If showing a playlist, jump to the given track id */
+/** If showing a playlist, jump to the given track id, you can call this method (and only this method) before SCLPlayerDidLoadNotification fires */
 - (void)playTrackWithID:(NSString*)soundcloudTrackID;
 
 /** Pause the player */
@@ -41,6 +53,17 @@
 /** "Toggle" the player */
 - (void)toggle;
 
+/**  Jump to the soundIndex sound, starting from 0 (only if the widget contains multiple sounds) */
+- (void)skip:(NSUInteger)soundIndex;
+
+- (void)getSounds:(SCLPlayerResponseHandler)responseBlock;
+- (void)getCurrentSound:(SCLPlayerResponseHandler)responseBlock;
+- (void)getCurrentSoundIndex:(SCLPlayerResponseHandler)responseBlock;
+
+- (void)getVolume:(SCLPlayerResponseHandler)responseBlock;
+- (void)getDuration:(SCLPlayerResponseHandler)responseBlock;
+- (void)getPosition:(SCLPlayerResponseHandler)responseBlock;
+
 @end
 
 #pragma mark - Constants
@@ -50,6 +73,12 @@ extern NSString* const SCLPlayerDidLoadNotification;
 extern NSString* const SCLPlayerDidPlayNotification;
 extern NSString* const SCLPlayerDidPauseNotification;
 extern NSString* const SCLPlayerDidFinishNotification;
+extern NSString* const SCLPlayerDidSeekNotification;
+
+extern NSString* const SCLPlayerPlayProgressNotification;
+extern NSString* const SCLPlayerLoadProgressNotification;
+
+extern NSString* const SCLPlayerContextUserInfoKey;
 
 #pragma mark Configuration
 extern NSString* const SCLPlayerPropertyHideRelated;
@@ -60,3 +89,4 @@ extern NSString* const SCLPlayerPropertySharing;
 extern NSString* const SCLPlayerPropertyLiking;
 extern NSString* const SCLPlayerPropertyDownload;
 extern NSString* const SCLPlayerPropertyBuying;
+

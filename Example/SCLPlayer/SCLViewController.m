@@ -25,7 +25,7 @@
                                                    configuration:@{SCLPlayerPropertyShowArtwork : @YES, SCLPlayerPropertyShowUser : @YES}];
     
     CGRect screenBounds = [UIScreen mainScreen].bounds;
-    self.playerVC.view.frame = CGRectMake(0, 48.f, CGRectGetWidth(screenBounds), 320.f);
+    self.playerVC.view.frame = CGRectMake(0, 32.f, CGRectGetWidth(screenBounds), 320.f);
     
     [self.view addSubview:self.playerVC.view];
 }
@@ -60,5 +60,44 @@
 {
     [self.playerVC toggle];
 }
+
+- (IBAction)seek:(id)sender
+{
+    [self.playerVC skip:3];
+}
+
+- (IBAction)getSounds:(id)sender
+{
+    [self.playerVC getSounds:^(id results) {
+        NSLog(@"Sounds are %@", results);
+    }];
+}
+
+- (IBAction)getCurrentSound:(id)sender
+{
+    [self.playerVC getCurrentSound:^(id results) {
+        NSLog(@"Current sound is %@", results);
+    }];
+
+//    [self.playerVC getCurrentSoundIndex:^(id results) {
+//        NSLog(@"Current sound index is %@", results);
+//    }];
+}
+
+- (IBAction)getPlayerState:(id)sender
+{
+    [self.playerVC getDuration:^(id results) {
+        NSLog(@"Duration is %@", results);
+    }];
+
+//    [self.playerVC getVolume:^(id results) {
+//        NSLog(@"Volume is %@", results);
+//    }];
+
+//    [self.playerVC getPosition:^(id results) {
+//        NSLog(@"Position is %@", results);
+//    }];
+}
+
 
 @end

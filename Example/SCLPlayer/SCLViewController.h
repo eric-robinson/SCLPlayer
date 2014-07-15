@@ -14,7 +14,10 @@
 - (IBAction)pause:(id)sender;
 - (IBAction)next:(id)sender;
 - (IBAction)prev:(id)sender;
-
+- (IBAction)seek:(id)sender;
 - (IBAction)toggle:(id)sender;
+
+- (IBAction)getCurrentSound:(id)sender;
+- (IBAction)getPlayerState:(id)sender;
 
 @end
