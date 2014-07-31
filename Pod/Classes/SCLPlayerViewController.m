@@ -54,7 +54,12 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
 @property (readwrite, assign, nonatomic) BOOL isPaused;
 
 @property (readwrite, strong, nonatomic) NSString *pendingTrackID;
+@property (readwrite, assign, nonatomic) BOOL isPendingPlay;
+
+@property (readwrite, assign, nonatomic) BOOL isLoadingPlayer;
 @property (readwrite, assign, nonatomic) BOOL hasLoadedPlayer;
+@property (readwrite, assign, nonatomic) BOOL loadDidFail;
+
 
 @property (readwrite, strong, nonatomic) NSMutableDictionary* pendingResponseHandlers;
 
@@ -117,17 +122,17 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
     self.webview.delegate = self;
     self.webview.opaque = NO;
     
-    self.blurToolbar = [[UIToolbar alloc] initWithFrame:self.webview.bounds];
-    self.blurToolbar.barStyle = UIBarStyleBlackTranslucent;
-    
     self.webview.backgroundColor = [UIColor clearColor];
-    [self.webview insertSubview:self.blurToolbar atIndex:0];
     self.webview.scrollView.scrollEnabled = NO;
     self.webview.scrollView.bounces = NO;
     self.webview.mediaPlaybackRequiresUserAction = NO;
     self.webview.suppressesIncrementalRendering = YES;
     
     [self.view addSubview:self.webview];
+
+    self.blurToolbar = [[UIToolbar alloc] initWithFrame:self.webview.bounds];
+    self.blurToolbar.barStyle = UIBarStyleBlackTranslucent;
+    [self.view insertSubview:self.blurToolbar atIndex:0];
     
     self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     [self.view addSubview:self.activityIndicator];
@@ -140,7 +145,20 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
     self.connectionIssueLabel.textColor = [UIColor whiteColor];
     self.connectionIssueLabel.alpha = 0;
     
-    [self.webview addSubview:self.connectionIssueLabel];
+    [self.view addSubview:self.connectionIssueLabel];
+    
+    [self loadPlayer];
+}
+
+- (void)loadPlayer
+{
+    if(self.isLoadingPlayer)
+    {
+        return;
+    }
+    
+    self.loadDidFail = NO;
+    self.isLoadingPlayer = YES;
     
     NSURL* scURL = [[NSBundle mainBundle] URLForResource:@"soundcloudPlayer" withExtension:@"html"];
     NSAssert(scURL, @"Unable to find soundcloudPlayer.html in source bundle");
@@ -161,7 +179,7 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
             [configurationParams appendString:@"&"];
         }
     }];
-
+    
     
     
     NSString* htmlString = [NSString stringWithContentsOfURL:scURL encoding:NSUTF8StringEncoding error:nil];
@@ -176,6 +194,10 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
     [self.webview loadHTMLString:htmlString baseURL:nil];
     
     [self.activityIndicator startAnimating];
+    
+    [UIView animateWithDuration:0.25 animations:^{
+        self.connectionIssueLabel.alpha = 0;
+    }];
 }
 
 - (void)viewDidLoad
@@ -203,6 +225,7 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
     }
     else
     {
+        [self loadPlayer];
         self.pendingTrackID = soundcloudTrackID;
     }
     
@@ -218,7 +241,14 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
 
 - (void)play
 {
-    [self.webview stringByEvaluatingJavaScriptFromString:@"SCLPlayer.scPlayer().play()"];
+    if(!self.hasLoadedPlayer)
+    {
+        self.isPendingPlay = YES;
+        [self loadPlayer];
+    }
+    else {
+        [self.webview stringByEvaluatingJavaScriptFromString:@"SCLPlayer.scPlayer().play()"];
+    }
 }
 
 - (void)next
@@ -308,7 +338,12 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
         NSString* contextJSON = (queryRange.location == NSNotFound) ? nil : [[playerMessage substringFromIndex:queryRange.location + 1] stringByRemovingPercentEncoding];
         
         NSError* jsonParsingError = nil;
-        id context = [NSJSONSerialization JSONObjectWithData:[contextJSON dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&jsonParsingError];
+        id context = nil;
+        
+        if(contextJSON)
+        {
+            context = [NSJSONSerialization JSONObjectWithData:[contextJSON dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&jsonParsingError];
+        }
         
         if(jsonParsingError)
         {
@@ -322,11 +357,29 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
             }
         }
         
-        NSDictionary* userContext = context ?: @{SCLPlayerContextUserInfoKey : context};
+        NSDictionary* userContext = nil;
+        
+        if (context)
+        {
+             userContext = @{SCLPlayerContextUserInfoKey : context};
+        }
         
         if ([command isEqualToString:@"didLoad"])
         {
             [[NSNotificationCenter defaultCenter] postNotificationName:SCLPlayerDidLoadNotification object:nil];
+            
+            if (self.pendingTrackID)
+            {
+                [self.webview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"SCLPlayer.playTrack(%@);", self.pendingTrackID]];
+                
+            }
+            else if (self.isPendingPlay)
+            {
+                [self play];
+            }
+            
+            self.pendingTrackID = nil;
+            self.isPendingPlay = NO;
         }
         else if ([command isEqualToString:@"didPlay"])
         {
@@ -379,28 +432,38 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
-    self.hasLoadedPlayer = YES;
+    self.isLoadingPlayer = NO;
     
-    if (self.pendingTrackID)
+    if (self.loadDidFail)
     {
-        [self.webview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"SCLPlayer.playTrack(%@);", self.pendingTrackID]];
-        self.pendingTrackID = nil;
+        return;
     }
+    
+    [self.activityIndicator stopAnimating];
+
+    self.hasLoadedPlayer = YES;
 
     [UIView animateWithDuration:0.25 animations:^{
         self.connectionIssueLabel.alpha = 0.f;
         self.webview.alpha = 1.f;
     }];
     
-    [self.activityIndicator stopAnimating];
+    
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
+    self.isLoadingPlayer = NO;
+    self.hasLoadedPlayer = NO;
+    self.loadDidFail = YES;
+    
+    
     [UIView animateWithDuration:0.25 animations:^{
         self.connectionIssueLabel.alpha = 1.f;
         self.webview.alpha = 0;
     }];
+    
+    [self.activityIndicator stopAnimating];
 }
 
 #pragma mark - Configuration

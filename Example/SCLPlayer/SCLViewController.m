@@ -27,13 +27,7 @@
     CGRect screenBounds = [UIScreen mainScreen].bounds;
     self.playerVC.view.frame = CGRectMake(0, 32.f, CGRectGetWidth(screenBounds), 320.f);
     
-    [self.view addSubview:self.playerVC.view];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    [self.view addSubview:self.playerVC.view];    
 }
 
 - (IBAction)play:(id)sender
@@ -63,7 +57,7 @@
 
 - (IBAction)seek:(id)sender
 {
-    [self.playerVC skip:3];
+    [self.playerVC seekTo:60000];
 }
 
 - (IBAction)getSounds:(id)sender
