@@ -6,8 +6,6 @@
 
 SCLPlayer is a UIWebView based wrapper for the SoundCloud HTML5 widget. It allows you to easily embed a SoundCloud player and message it from your Cocoa code.
 
-![](https://dl.dropboxusercontent.com/u/10239781/lwlvl_screenshot.png)
-
 ## Usage
 
 To create a player...
@@ -74,3 +72,6 @@ Eric Robinson, eric DOT robinson AT me.com
 
 SCLPlayer is available under the MIT license. See the LICENSE file for more info.
 
+## Backstory / Screenshot
+
+SCLPlayer was developed for the lWlVl festival app. (It's the bit at the bottom) ![](https://dl.dropboxusercontent.com/u/10239781/lwlvl_screenshot.png)
