@@ -74,4 +74,6 @@ SCLPlayer is available under the MIT license. See the LICENSE file for more info
 
 ## Backstory / Screenshot
 
-SCLPlayer was developed for the lWlVl festival app. (It's the bit at the bottom) ![](https://dl.dropboxusercontent.com/u/10239781/lwlvl_screenshot.png)
+SCLPlayer was developed for the lWlVl festival app. (It's the bit at the bottom)
+
+![](https://dl.dropboxusercontent.com/u/10239781/lwlvl_screenshot.png)
