@@ -15,7 +15,7 @@
 NSString* const SCLPlayerDidLoadNotification = @"SCLPlayerDidLoadNotification";
 NSString* const SCLPlayerDidPlayNotification = @"SCLPlayerDidPlayNotification";
 NSString* const SCLPlayerDidPauseNotification = @"SCLPlayerDidPauseNotification";
-NSString* const SCLPlayerDidFinishNotification = @"SCLPlayerDidPauseNotification";
+NSString* const SCLPlayerDidFinishNotification = @"SCLPlayerDidFinishNotification";
 NSString* const SCLPlayerDidSeekNotification = @"SCLPlayerDidSeekNotification";
 
 NSString* const SCLPlayerPlayProgressNotification = @"SCLPlayerPlayProgressNotification";
