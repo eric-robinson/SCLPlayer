@@ -177,7 +177,8 @@ NSString* const SCLPlayerPropertyVisual        = @"visual";
     NSURL* scURL = [[NSBundle mainBundle] URLForResource:@"soundcloudPlayer" withExtension:@"html"];
     NSAssert(scURL, @"Unable to find soundcloudPlayer.html in source bundle");
     
-    NSString* urlParam = [[self.initialURL absoluteString] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString* urlParam = [[self.initialURL absoluteString] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLHostAllowedCharacterSet]];
+    
     NSMutableString* configurationParams = [NSMutableString new];
     
     __block NSUInteger configIndex = 0;
@@ -202,7 +203,7 @@ NSString* const SCLPlayerPropertyVisual        = @"visual";
                                                        withString:urlParam];
     
     htmlString = [htmlString stringByReplacingOccurrencesOfString:@"{{CONFIGURATION}}"
-                                                       withString:[configurationParams stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+                                                       withString:[configurationParams stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLHostAllowedCharacterSet]]];
     
     
     [self.webview loadHTMLString:htmlString baseURL:nil];
