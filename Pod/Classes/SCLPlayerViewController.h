@@ -27,6 +27,9 @@ typedef void (^SCLPlayerResponseHandler)(id results);
 
 - (id)initWithURL:(NSURL*)url configuration:(NSDictionary*)config;
 
+
+- (void)loadPlayerWithURL:(NSURL *)url;
+
 #pragma mark - Player Controls
 
 /** Start playing from the current position */
@@ -99,4 +102,5 @@ extern NSString* const SCLPlayerPropertySharing;
 extern NSString* const SCLPlayerPropertyLiking;
 extern NSString* const SCLPlayerPropertyDownload;
 extern NSString* const SCLPlayerPropertyBuying;
-
+extern NSString* const SCLPlayerPropertyShowPlaycount;
+extern NSString* const SCLPlayerPropertyVisual;

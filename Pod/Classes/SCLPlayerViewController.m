@@ -12,26 +12,28 @@
 //auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=false&amp;show_artwork=false&amp;sharing=false&amp;liking=false&amp;download=false&amp;buying=false&amp;show_reposts=false
 
 #pragma mark Notifications
-NSString* const SCLPlayerDidLoadNotification = @"SCLPlayerDidLoadNotification";
-NSString* const SCLPlayerDidPlayNotification = @"SCLPlayerDidPlayNotification";
-NSString* const SCLPlayerDidPauseNotification = @"SCLPlayerDidPauseNotification";
-NSString* const SCLPlayerDidFinishNotification = @"SCLPlayerDidFinishNotification";
-NSString* const SCLPlayerDidSeekNotification = @"SCLPlayerDidSeekNotification";
+NSString* const SCLPlayerDidLoadNotification      = @"SCLPlayerDidLoadNotification";
+NSString* const SCLPlayerDidPlayNotification      = @"SCLPlayerDidPlayNotification";
+NSString* const SCLPlayerDidPauseNotification     = @"SCLPlayerDidPauseNotification";
+NSString* const SCLPlayerDidFinishNotification    = @"SCLPlayerDidPauseNotification";
+NSString* const SCLPlayerDidSeekNotification      = @"SCLPlayerDidSeekNotification";
 
 NSString* const SCLPlayerPlayProgressNotification = @"SCLPlayerPlayProgressNotification";
 NSString* const SCLPlayerLoadProgressNotification = @"SCLPlayerLoadProgressNotification";
 
-NSString* const SCLPlayerContextUserInfoKey = @"SCLPlayerContext";
+NSString* const SCLPlayerContextUserInfoKey       = @"SCLPlayerContext";
 
 #pragma mark Configuration
-NSString* const SCLPlayerPropertyHideRelated = @"hide_related";
-NSString* const SCLPlayerPropertyShowComments = @"show_comments";
-NSString* const SCLPlayerPropertyShowUser  = @"show_user";
-NSString* const SCLPlayerPropertyShowArtwork = @"show_artwork";
-NSString* const SCLPlayerPropertySharing = @"sharing";
-NSString* const SCLPlayerPropertyLiking = @"liking";
-NSString* const SCLPlayerPropertyDownload = @"download";
-NSString* const SCLPlayerPropertyBuying = @"buying";
+NSString* const SCLPlayerPropertyHideRelated   = @"hide_related";
+NSString* const SCLPlayerPropertyShowComments  = @"show_comments";
+NSString* const SCLPlayerPropertyShowUser      = @"show_user";
+NSString* const SCLPlayerPropertyShowArtwork   = @"show_artwork";
+NSString* const SCLPlayerPropertySharing       = @"sharing";
+NSString* const SCLPlayerPropertyLiking        = @"liking";
+NSString* const SCLPlayerPropertyDownload      = @"download";
+NSString* const SCLPlayerPropertyBuying        = @"buying";
+NSString* const SCLPlayerPropertyShowPlaycount = @"show_playcount";
+NSString* const SCLPlayerPropertyVisual        = @"visual";
 
 @interface SCLPlayerViewController () <UIWebViewDelegate>
 
@@ -96,12 +98,18 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
         self.pendingResponseHandlers = [NSMutableDictionary dictionary];
         
         [self.pendingResponseHandlers addEntriesFromDictionary:@{
-            @"getSounds" : [NSMutableArray array],
-            @"getCurrentSound" : [NSMutableArray array]
-        }];
+                                                                 @"getSounds" : [NSMutableArray array],
+                                                                 @"getCurrentSound" : [NSMutableArray array]
+                                                                 }];
     }
     
     return self;
+}
+
+- (void)loadPlayerWithURL:(NSURL *)url {
+    [self pause];
+    self.initialURL = url;
+    [self loadPlayer];
 }
 
 - (void)loadView
@@ -129,7 +137,7 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
     self.webview.suppressesIncrementalRendering = YES;
     
     [self.view addSubview:self.webview];
-
+    
     self.blurToolbar = [[UIToolbar alloc] initWithFrame:self.webview.bounds];
     self.blurToolbar.barStyle = UIBarStyleBlackTranslucent;
     [self.view insertSubview:self.blurToolbar atIndex:0];
@@ -154,6 +162,12 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
 {
     if(self.isLoadingPlayer)
     {
+        return;
+    }
+    
+    if (!self.initialURL)
+    {
+        [self.activityIndicator startAnimating];
         return;
     }
     
@@ -353,7 +367,7 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
             
             if(context == nil)
             {
-                NSLog(@"%s: Unable to parse response param: %@", __PRETTY_FUNCTION__, urlString);                
+                NSLog(@"%s: Unable to parse response param: %@", __PRETTY_FUNCTION__, urlString);
             }
         }
         
@@ -361,7 +375,7 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
         
         if (context)
         {
-             userContext = @{SCLPlayerContextUserInfoKey : context};
+            userContext = @{SCLPlayerContextUserInfoKey : context};
         }
         
         if ([command isEqualToString:@"didLoad"])
@@ -440,9 +454,9 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
     }
     
     [self.activityIndicator stopAnimating];
-
+    
     self.hasLoadedPlayer = YES;
-
+    
     [UIView animateWithDuration:0.25 animations:^{
         self.connectionIssueLabel.alpha = 0.f;
         self.webview.alpha = 1.f;
@@ -477,7 +491,9 @@ NSString* const SCLPlayerPropertyBuying = @"buying";
              SCLPlayerPropertySharing,
              SCLPlayerPropertyLiking,
              SCLPlayerPropertyDownload,
-             SCLPlayerPropertyBuying];
+             SCLPlayerPropertyBuying,
+             SCLPlayerPropertyShowPlaycount,
+             SCLPlayerPropertyVisual];
 }
 
 @end
